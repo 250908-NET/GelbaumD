@@ -19,6 +19,7 @@ namespace _6_FlowControl
         /// <returns></returns>
         public static int GetValidTemperature()
         {
+
             throw new NotImplementedException($"GetValidTemperature() has not been implemented.");
         }
 
@@ -39,6 +40,37 @@ namespace _6_FlowControl
         /// <param name="temp"></param>
         public static void GiveActivityAdvice(int temp)
         {
+            switch (temp)
+            {
+                case int n when n < -20:
+                Console.WriteLine("hella cold");
+                break;
+                case int n when -20 <= n < 0:
+                Console.WriteLine("pretty cold");
+                break;
+                case int n when 0 <= n < 20:
+                Console.WriteLine("cold");
+                break;
+                case int n when 20 <= n < 40:
+                Console.WriteLine("thawed out");
+                break;
+                case int n when 40 <= n < 60:
+                Console.WriteLine("feels like Autumn");
+                break;
+                case int n when 60 <= n < 80:
+                Console.WriteLine("perfect outdoor workout temperature");
+                break;
+                case int n when 80 <= n < 90:
+                Console.WriteLine("niiice");
+                break;
+                case int n when 90 <= n < 100:
+                Console.WriteLine("hella hot");
+                break;
+                case int n when 100 <= n < 135:
+                Console.WriteLine("hottest");
+                break;
+                
+            }
             throw new NotImplementedException($"GiveActivityAdvice() has not been implemented.");
         }
 
@@ -49,6 +81,9 @@ namespace _6_FlowControl
         /// </summary>
         public static void Register()
         {
+            //if not as parameters how am I getting the username and password from the user??
+            new String userName = "";
+            new String password = "";
             throw new NotImplementedException($"Register() has not been implemented.");
         }
 
@@ -62,6 +97,7 @@ namespace _6_FlowControl
         /// <returns></returns>
         public static bool Login()
         {
+            // Create a new username and password variable..  Compare them to the variables created in Register() and return true if they both match
             throw new NotImplementedException($"Login() has not been implemented.");
         }
 
@@ -75,6 +111,19 @@ namespace _6_FlowControl
         /// <param name="temp"></param>
         public static void GetTemperatureTernary(int temp)
         {
+            switch (temp){
+                int n when n <= 42:
+                Console.WriteLine($"{temp} is too cold!");
+                break;
+                int n when n >= 43 && n <= 78:
+                Console.WriteLine($"{temp} is an ok temperature");
+                break;
+                int n when n > 78:
+                Console.WriteLine($"{temp} is too hot!");
+                break;
+                
+                
+            }
             throw new NotImplementedException($"GetTemperatureTernary() has not been implemented.");
         }
     }//EoP

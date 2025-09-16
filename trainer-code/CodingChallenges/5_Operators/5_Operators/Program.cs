@@ -16,7 +16,8 @@ namespace _5_OperatorsChallenge
         /// <returns></returns>
         public static int Increment(int num)
         {
-            return num++;
+            num++;
+            return num;
             throw new NotImplementedException($"Increment() is not implemented yet.");
         }
 
@@ -27,7 +28,8 @@ namespace _5_OperatorsChallenge
         /// <returns></returns>
         public static int Decrement(int num)
         {
-            return num--;
+            num--;
+            return num;
             throw new NotImplementedException($"Decrement() is not implemented yet");
         }
 

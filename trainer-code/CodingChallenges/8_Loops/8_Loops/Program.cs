@@ -20,6 +20,13 @@ namespace _8_LoopsChallenge
         /// <returns></returns>
         public static int UseFor(List<int> x)
         {
+            int counter = 0;
+            for(int i = 0; i < x.Count() -1; i++){
+                if (x[i] % 2 != 0){
+                    counter++;
+                }
+                return counter;
+            }
             throw new NotImplementedException("UseFor() is not implemented yet.");
         }
 
@@ -31,6 +38,7 @@ namespace _8_LoopsChallenge
         /// <returns></returns>
         public static int UseForEach(List<object> x)
         {
+            // What exactly do they mean by "even entries"  Even numbered? ie 2nd, 4th etc?
             throw new NotImplementedException("UseForEach() is not implemented yet.");
         }
 
@@ -42,6 +50,17 @@ namespace _8_LoopsChallenge
         /// <param name="x"></param>
         public static int UseWhile(List<int> x)
         {
+            int counter = 0;
+            for(int i =0; i < x.Count()- 1; i++){
+                if (x[i] = 1234)
+                break;
+                else if(x[i] % 4 = 0){
+                    count++;
+                }
+                return count;
+            }
+            
+
             throw new NotImplementedException("UseFor() is not implemented yet.");
         }
 
