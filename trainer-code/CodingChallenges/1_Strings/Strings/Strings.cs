@@ -6,7 +6,13 @@ namespace StringManipulationChallenge
     {
         static void Main(string[] args)
         {
-            
+            StringToUpper("Hello");
+            StringToLower("World");
+            StringTrim(" Trimed ");
+            StringSubstring("Revature", 1, 3);
+            SearchChar("banana","v");
+            ConcatNames("Coding", "Challenge");
+
             /*
             *
             * implement the required code here and within the methods below.
@@ -86,8 +92,13 @@ namespace StringManipulationChallenge
         /// <returns></returns>
         public static int SearchChar(string userInputString, char charUserWants)
         {
-            int index = userInputString.IndexOf(charUserWants);
+            string trimmedString = userInputString.Trim();
+            int index = trimmedString.IndexOf(charUserWants);
+            if(index < 0 ){
+                return -1;
+            }
             return index;
+            
             throw new NotImplementedException("SearchChar method not implemented.");
         }
 
