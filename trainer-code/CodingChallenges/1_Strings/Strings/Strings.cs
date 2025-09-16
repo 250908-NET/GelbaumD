@@ -6,12 +6,7 @@ namespace StringManipulationChallenge
     {
         static void Main(string[] args)
         {
-            StringToUpper("Hello");
-            StringToLower("World");
-            StringTrim(" Trimed ");
-            StringSubstring("Revature", 1, 3);
-            SearchChar("banana","v");
-            ConcatNames("Coding", "Challenge");
+           
 
             /*
             *
@@ -75,7 +70,7 @@ namespace StringManipulationChallenge
         /// <returns></returns>
         public static string StringSubstring(string x, int firstElement, int lengthOfSubstring)
         {
-           return x.Substring(firstElement,lengthOfSubstring - 1);
+           return x.Substring(firstElement,lengthOfSubstring);
 
             throw new NotImplementedException("StringSubstring method not implemented.");
         }
