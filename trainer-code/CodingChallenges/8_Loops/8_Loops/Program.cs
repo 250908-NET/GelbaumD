@@ -51,14 +51,23 @@ namespace _8_LoopsChallenge
         public static int UseWhile(List<int> x)
         {
             int counter = 0;
-            for(int i =0; i < x.Count()- 1; i++){
-                if (x[i] = 1234)
-                break;
-                else if(x[i] % 4 = 0){
-                    count++;
+            do {
+                for(int i = 0; i < x.Count() - 1; i++){
+                    if(x[i] % 4 = 0){
+                        counter++;
+                    }
                 }
-                return count;
+                while(x[i] != 1234);
+                return counter;
             }
+            // for(int i = 0; i < x.Count()- 1; i++){
+            //     if (x[i] = 1234)
+            //     break;
+            //     else if(x[i] % 4 = 0){
+            //         count++;
+            //     }
+            //     return count;
+            // }
             
 
             throw new NotImplementedException("UseFor() is not implemented yet.");
