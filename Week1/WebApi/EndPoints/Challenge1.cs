@@ -1,7 +1,7 @@
 namespace WebApi.EndPoints;
 
 public static class Challenge1 {
-    public static void MapCalculatorEndpoints(this IEndpointRouteBuilder app) {
+    public static void MapCalculatorEndpoints1(this IEndpointRouteBuilder app) {
         app.MapGet("/calculator/add/{a}/{b}", (double a, double b) => {
             return Results.Ok(new { operation = "add", result = a + b });
         });

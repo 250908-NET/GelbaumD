@@ -35,8 +35,12 @@ if (app.Environment.IsDevelopment())
 // })
 // .WithName("GetWeatherForecast");
 
-app.MapCalculatorEndpoints();      //this and line 38 do the same thing
+app.MapCalculatorEndpoints1();  
+app.MapCalculatorEndpoints2();     //this and line 38 do the same thing
 
+
+
+app.MapTemperatureEndpoints(); // 6
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
