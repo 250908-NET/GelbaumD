@@ -36,7 +36,9 @@ if (app.Environment.IsDevelopment())
 // .WithName("GetWeatherForecast");
 
 app.MapCalculatorEndpoints1();  
-app.MapCalculatorEndpoints2();     //this and line 38 do the same thing
+app.MapCalculatorEndpoints2();
+app.MapCalculatorEndpoints6();
+     //this and line 38 do the same thing
 
 
 
