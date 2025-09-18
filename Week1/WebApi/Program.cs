@@ -37,7 +37,8 @@ if (app.Environment.IsDevelopment())
 
 app.MapCalculatorEndpoints1();  
 app.MapCalculatorEndpoints2();
-app.MapCalculatorEndpoints6();
+app.MapCalculatorEndpoints3();
+
      //this and line 38 do the same thing
 
 

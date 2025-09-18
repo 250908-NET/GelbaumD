@@ -58,7 +58,7 @@ public static class Challenge6
         };
     }
 
-    public static void MapTemperatureEndpoints6(this IEndpointRouteBuilder app)
+    public static void MapTemperatureEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet("/temp/{from}-to-{to}/{temperature}", (string from, string to, double temperature) =>
         {
