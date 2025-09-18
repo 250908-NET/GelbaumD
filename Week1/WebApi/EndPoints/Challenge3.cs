@@ -49,10 +49,10 @@ public static class Challenge3 {
             return Results.Ok(new { operation = "fibonacci", result = fibArray });
         });
 
-        app.MapGet("/numbers/factors/{number}", (int count) => {
+        app.MapGet("/numbers/factors/{number}", (int number) => {
             List<int> factorsList = new List<int>();
-            for(int i = 1; i <= count; i++){
-                if(count % i == 0 ){
+            for(int i = 1; i <= number; i++){
+                if(number % i == 0 ){
                     factorsList.Add(i);
                 }
             }
