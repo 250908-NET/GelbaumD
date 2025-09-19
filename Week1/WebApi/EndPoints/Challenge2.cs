@@ -2,7 +2,7 @@ namespace WebApi.EndPoints;
 using System;
 
 public static class Challenge2 {
-    public static void MapCalculatorEndpoints2(this IEndpointRouteBuilder app) {
+    public static void MapStringManipulatorEndpoints(this IEndpointRouteBuilder app) {
         app.MapGet("/text/reverse/{text}", (string text) => {
             // new char[] input = text.ToCharArray();
             return Results.Ok(new { operation = "reverse" , result = string.Concat(text.Reverse()) });

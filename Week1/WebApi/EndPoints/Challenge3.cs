@@ -1,7 +1,7 @@
 namespace WebApi.EndPoints;
 
 public static class Challenge3 {
-    public static void MapCalculatorEndpoints3(this IEndpointRouteBuilder app) {
+    public static void MapNumberGamesEndpoints(this IEndpointRouteBuilder app) {
         app.MapGet("/numbers/fizzbuzz/{count}", (int count) => {
             string fizzBuzz = "";
             for(int i = 1; i <= count; i++){
