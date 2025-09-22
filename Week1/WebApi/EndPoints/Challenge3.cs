@@ -5,7 +5,10 @@ public static class Challenge3 {
         app.MapGet("/numbers/fizzbuzz/{count}", (int count) => {
             string fizzBuzz = "";
             for(int i = 1; i <= count; i++){
-                if(i % 3 == 0 && i % 5 == 0){
+                // if(count == 0){
+                //     fizzBuzz += "Sorry all out of fizzbuzz";
+                // }
+                 if(i % 3 == 0 && i % 5 == 0){
                     fizzBuzz += " fizzbuzz ";
                 }
                 else if (i % 5 == 0){
@@ -15,7 +18,7 @@ public static class Challenge3 {
                     fizzBuzz += " fizz ";
                 }
                 else {
-                    fizzBuzz += " " + i;
+                    fizzBuzz += " " + i + " ";
                 }
 
             }
@@ -61,21 +64,5 @@ public static class Challenge3 {
         });
 
 
-
-        // app.MapGet("/calculator/subtract/{a}/{b}", (double a, double b) => {
-        //     return Results.Ok(new { operation = "subtract" ,result = a - b });
-        // });
-
-        // app.MapGet("/calculator/multiply/{a}/{b}", (double a, double b) => {
-        //     return Results.Ok(new { operation = "multiply" , result = a * b });
-        // });
-        
-        // app.MapGet("/calculator/divide/{a}/{b}", (double a, double b) => {
-        //     if (b == 0) {
-        //         return Results.BadRequest(new {error = "Cannot divide by zero"});
-        //     }
-            
-        //     return Results.Ok(new { operation = "divide" , result = a / b });
-        // });
     }
 }

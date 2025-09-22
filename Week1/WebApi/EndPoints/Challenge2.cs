@@ -7,8 +7,7 @@ public static class Challenge2 {
             // new char[] input = text.ToCharArray();
             return Results.Ok(new { operation = "reverse" , result = string.Concat(text.Reverse()) });
 
-            //var reversed = new string(text.Reverse().ToArray());
-            //return new {operation = "reverse", rev = reversed};
+
         });
         app.MapGet("/text/uppercase/{text}", (string text) =>{
             return Results.Ok(new { operation = "uppercase" , result = text.ToUpper()});
@@ -33,11 +32,8 @@ public static class Challenge2 {
 
          app.MapGet("/text/palindrome/{text}", (string text) =>
         {
-             string cleanedWord = text.ToLower();
-             bool isPalindrome =false;
-            // char[] wordArray = cleanedWord.ToCharArray();
-            // char[] reversedWordArray = Array.Reverse(wordArray);
-            // string reversedWord = new string(reversedWordArray);
+            string cleanedWord = text.ToLower();
+            bool isPalindrome =false;
             int start =0;
             int end =cleanedWord.Length -1;
 
