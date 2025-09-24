@@ -4,8 +4,13 @@ namespace Barbershop.Services
 {
     public interface IBarberService
     {
-        // Show all their appointments
-        public Task<List<Appointment>> GetAllSync();
-       
+        
+        // Create Barber
+        public Task CreateAsync(Barber barber);
+
+        // Get all  appointments by barberid
+        // public Task<List<Appointment>> GetAppointmentsByBarberIdAsync(int barberId);
+        
+
     }
 }
