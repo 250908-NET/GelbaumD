@@ -5,9 +5,9 @@ namespace Barbershop.Services
 {
     public class AppointmentService : IAppointmentService
     {
-        private readonly IAppointmentService _repo;
+        private readonly IAppointmentRepository _repo;
 
-        public AppointmentService(IAppointmentService repo)
+        public AppointmentService(IAppointmentRepository repo)
         {
             _repo = repo;
         
@@ -19,14 +19,14 @@ namespace Barbershop.Services
 
         public async Task CreateAsync(Appointment appointment)
         {
-            await _repo.AddAsync(appointments);
-            await _repor.SaveChangesAsync();
+            await _repo.AddAsync(appointment);
+            await _repo.SaveChangesAsync();
         }
 
         // Delete an appointment??
         public async Task<bool> DeleteAsync(int id)
         {
-            var appointment = await _repo.GetIdAsync(id);
+            var appointment = await _repo.GetByIdAsync(id);
             if(appointment == null)
                 return false;
             
@@ -49,7 +49,7 @@ namespace Barbershop.Services
                 existingAppointment.Barbers.Add(new Barber { Id = newBarberId });
             }
 
-            existingAppointment.AppointmentTime = newAppointmentTime;
+            existingAppointment.AppointmentDateAndTime = newAppointmentTime;
 
             await _repo.SaveChangesAsync();
             return true;

@@ -9,7 +9,7 @@ public class Appointment
     public int Id { get; set; }
 
     [Required]
-    [Appointment(9,17)]
+    // [Appointment(9,17)]
     public DateTime AppointmentDateAndTime { get; set; }
 
     [Required, MaxLength(20)]

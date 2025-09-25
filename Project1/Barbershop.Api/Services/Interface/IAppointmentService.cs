@@ -15,7 +15,7 @@ namespace Barbershop.Services
         // Create an appointment
         public Task CreateAsync(Appointment appointment);
         // Delete an appointment
-        public Task<bool> DeleteAsynce(int id);
+        public Task<bool> DeleteAsync(int id);
         // Update existing appointment by barber or time only
         public Task<bool> UpdateAsync(int appointmentId, int newBarberId, DateTime newAppointmentTime);
     }

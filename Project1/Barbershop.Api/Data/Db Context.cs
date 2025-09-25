@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using barbershop.Models;
+using Barbershop.Models;
 
 namespace Barbershop.Data;
 
-public class BarbershopDbContext : Db BarbershopDbContext
+public class BarbershopDbContext : DbContext
 {
 
     public DbSet<Customer> Customers { get; set; }
-    public DbSet<Apointment> Appointments { get; set; }
+    public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Barber> Barbers { get; set; }
 
     public BarbershopDbContext( DbContextOptions<BarbershopDbContext> options) : base(options) {}

@@ -1,0 +1,16 @@
+using Barbershop.Models;
+
+namespace Barbershop.Repositories
+{
+    public interface IAppointmentRepository
+    {
+        public Task<List<Appointment>> GetAllAsync();
+        public Task<Appointment?> GetByIdAsync(int id);
+        public Task<List<Appointment>> GetAppointmentsByBarberIdAsync(int barberId);
+        public Task AddAsync(Appointment appointment);
+        void Remove(Appointment appointment);
+        public Task SaveChangesAsync();
+        void Update(Appointment appointment);
+
+    }
+}
