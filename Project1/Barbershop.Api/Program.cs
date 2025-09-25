@@ -86,5 +86,29 @@ app.MapGet("/customers/{id:int}", async (int id, ICustomerService customerServic
     }
 });
 
+// __________Appointments__________
+// Helps with Haircut types, now a selection of strings in an Enum...
+string GetDisplayName(Enum enumValue) =>
+    enumValue.GetType()
+             .GetMember(enumValue.ToString())[0]
+             .GetCustomAttribute<DisplayAttribute>()?
+             .Name ?? enumValue.ToString();
+
+app.MapGet("/appointments/{id:int}", async (int id, IAppointmentService appointmentService) =>
+{
+    var appointment = await appointmentService.GetByIdAsync(id);
+
+    if (appointment == null)
+        return Results.NotFound(new { message = $"Appointment with ID {id} not found." });
+
+    var dto = new AppointmentDto
+    {
+        Id = appointment.Id,
+        AppointmentDateAndTime = appointment.AppointmentDateAndTime,
+        HaircutType = GetDisplayName(appointment.HaircutType) // "Haircut and Beard"
+    };
+
+    return Results.Ok(dto);
+});
 app.Run();
 

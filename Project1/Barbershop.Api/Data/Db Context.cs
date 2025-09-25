@@ -15,6 +15,9 @@ public class BarbershopDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Appointment>()
+        .Property(a => a.HaircutType)
+        .HasConversion<string>();
     }
 
 }
