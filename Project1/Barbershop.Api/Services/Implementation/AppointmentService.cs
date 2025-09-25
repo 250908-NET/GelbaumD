@@ -19,6 +19,16 @@ namespace Barbershop.Services
 
         public async Task CreateAsync(Appointment appointment)
         {
+    // Ask the repository for existing appointments instead of using _context
+            var allAppointments = await _repo.GetAllAsync();
+            bool conflict = allAppointments.Any(a =>
+                a.AppointmentDateAndTime == appointment.AppointmentDateAndTime &&
+                a.Barbers.Any(b => appointment.Barbers.Select(bb => bb.Id).Contains(b.Id))
+            );
+
+            if (conflict)
+                throw new InvalidOperationException("A barber is already booked at that time.");
+
             await _repo.AddAsync(appointment);
             await _repo.SaveChangesAsync();
         }
@@ -35,27 +45,30 @@ namespace Barbershop.Services
             return true;
         }
         // Upate an exiting appointment 
-        public async Task<bool> UpdateAsync(int appointmentId, int newBarberId, DateTime newAppointmentTime)
-        {
-            var existingAppointment = await _repo.GetByIdAsync(appointmentId);
-            if (existingAppointment == null)
-                throw new KeyNotFoundException($"Appointment with ID {appointmentId} not found.");
+       public async Task<bool> UpdateAsync(int appointmentId, int newBarberId, DateTime newAppointmentTime)
+{
+    var existingAppointment = await _repo.GetByIdAsync(appointmentId);
+    if (existingAppointment == null)
+        throw new KeyNotFoundException($"Appointment with ID {appointmentId} not found.");
 
-            // Find the barber in the list and replace/update
-            var barber = existingAppointment.Barbers.FirstOrDefault(b => b.Id == newBarberId);
-            if (barber == null)
-            {
-                // Optionally, add the new barber to the list
-                existingAppointment.Barbers.Add(new Barber { Id = newBarberId });
-            }
+    // ✅ Use repository instead of _context
+    bool conflict = await _repo.BarberHasAppointmentAtTimeAsync(newBarberId, newAppointmentTime, appointmentId);
+    if (conflict)
+        throw new InvalidOperationException($"Barber {newBarberId} is already booked at {newAppointmentTime}.");
 
-            existingAppointment.AppointmentDateAndTime = newAppointmentTime;
+    var barber = existingAppointment.Barbers.FirstOrDefault(b => b.Id == newBarberId);
+    if (barber == null)
+    {
+        existingAppointment.Barbers.Add(new Barber { Id = newBarberId });
+    }
 
-            await _repo.SaveChangesAsync();
-            return true;
-        }
+    existingAppointment.AppointmentDateAndTime = newAppointmentTime;
 
-        // New method: Get all appointments containing a specific barber
+    await _repo.SaveChangesAsync();
+    return true;
+}
+
+        // Get all appointments containing a specific barber
         public async Task<List<Appointment>> GetAppointmentsByBarberIdAsync(int barberId)
         {
             var allAppointments = await _repo.GetAllAsync();

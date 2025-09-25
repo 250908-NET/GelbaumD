@@ -47,6 +47,17 @@ namespace Barbershop.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public async Task<bool> BarberHasAppointmentAtTimeAsync(int barberId, DateTime time, int? excludeAppointmentId = null)
+        {
+            // 
+            return await _context.Appointments
+                .Include(a => a.Barbers)
+                .AnyAsync(a =>
+                    a.AppointmentDateAndTime == time &&
+                    a.Barbers.Any(b => b.Id == barberId) &&
+                    (!excludeAppointmentId.HasValue || a.Id != excludeAppointmentId.Value));
+        }
     }
  
 }

@@ -11,6 +11,8 @@ namespace Barbershop.Repositories
         void Remove(Appointment appointment);
         public Task SaveChangesAsync();
         void Update(Appointment appointment);
+        // Check to see if a barber has an appointment at that time
+        Task<bool> BarberHasAppointmentAtTimeAsync(int barberId, DateTime time, int? excludeAppointmentId = null);
 
     }
 }

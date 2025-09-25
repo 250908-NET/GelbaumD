@@ -11,7 +11,9 @@ public class Barber
     [Required]
     [MaxLength(20)]
     public string BarberName { get; set; }
-   
+
+    public string Name { get; set; } = string.Empty;
+       
     public List<Appointment> Appointments { get; set; } = new();
 
 }
