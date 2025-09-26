@@ -7,13 +7,10 @@ public class Barber
 {
    
     public int Id { get; set; }
-    
     [Required]
     [MaxLength(20)]
-    public string BarberName { get; set; }
-
     public string Name { get; set; } = string.Empty;
-       
+
     public List<Appointment> Appointments { get; set; } = new();
 
 }

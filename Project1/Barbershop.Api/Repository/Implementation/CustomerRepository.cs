@@ -1,8 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Barbershop.Models;
 using Barbershop.Data;
-using Microsoft.EntityFrameworkCore;
-
 namespace Barbershop.Repositories
+
 {
     public class CustomerRepository : ICustomerRepository
     {
@@ -15,8 +15,10 @@ namespace Barbershop.Repositories
 
         public async Task<Customer?> GetByIdAsync(int id)
         {
-            //return await _context.Students.Where( student => student.id  == id);
-            throw new NotImplementedException();
+            return await _context.Customers
+                .Include(c => c.Appointments)
+                .ThenInclude(a => a.Barbers)
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task AddAsync(Customer customer)

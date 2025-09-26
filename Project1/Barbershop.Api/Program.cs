@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using Barbershop.Data;
@@ -11,9 +12,16 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 string CS = File.ReadAllText("./ConnectionString.env");
 
-Console.WriteLine(CS);
 
 // Add services to the container
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 builder.Services.AddEndpointsApiExplorer();   // ✅ Needed for Swagger/OpenAPI
 builder.Services.AddSwaggerGen();            // ✅ Needed for Swagger/OpenAPI
 builder.Services.AddOpenApi();
@@ -38,6 +46,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+
 }
 
 app.UseHttpsRedirection();
@@ -47,46 +57,53 @@ app.MapGet("/", () => {
 });
 // _____________________________Customer_____________________________
 // Create a customer
-app.MapPost("/customers", async (Customer customer, ICustomerService customerService) =>
+app.MapPost("/customers", async (CustomerCreateDto dto, ICustomerService service) =>
 {
-    // Example: only validate Name since PhoneNumber doesn't exist
-    if (string.IsNullOrWhiteSpace(customer.FirstName))
+    var customer = new Customer
     {
-        return Results.BadRequest(new { message = "Customer name is required." });
-    }
+        FirstName = dto.FirstName,
+        LastName  = dto.LastName,
+        Email     = dto.Email
+    };
 
-    try
-    {
-        await customerService.CreateAsync(customer);
-        return Results.Created($"/customers/{customer.Id}", customer);
-    }
-    catch (Exception ex)
-    {
-        // Optionally log the exception (Serilog, etc.)
-        // Log.Error(ex, "Error creating customer");
+    await service.CreateAsync(customer);
 
-        return Results.Problem("An error occurred while creating the customer.");
-    }
+    return Results.Created($"/customers/{customer.Id}", new
+    {
+        customer.Id,
+        customer.FirstName,
+        customer.LastName,
+        customer.Email
+    });
 });
 // Get Customer by Id
 app.MapGet("/customers/{id:int}", async (int id, ICustomerService customerService) =>
 {
-    try
-    {
-        var customer = await customerService.GetByIdAsync(id);
+    var customer = await customerService.GetByIdAsync(id);
+    if (customer == null)
+        return Results.NotFound(new { message = $"Customer with ID {id} not found." });
 
-        if (customer == null)
+    // Map Customer → CustomerDto
+    var dto = new CustomerDto
+    {
+        Id = customer.Id,
+        FirstName = customer.FirstName,
+        LastName = customer.LastName,
+        Email = customer.Email,
+        Appointments = customer.Appointments.Select(a => new AppointmentDto
         {
-            return Results.NotFound(new { message = $"Customer with ID {id} not found." });
-        }
+            Id = a.Id,
+            AppointmentDateAndTime = a.AppointmentDateAndTime,
+            HaircutType = a.HaircutType.ToString(),
+            Barbers = a.Barbers.Select(b => new BarberDto
+            {
+                Id = b.Id,
+                Name = b.Name
+            }).ToList()
+        }).ToList()
+    };
 
-        return Results.Ok(customer);
-    }
-    catch (Exception ex)
-    {
-        // Log.Error(ex, "Error retrieving customer");
-        return Results.Problem("An error occurred while retrieving the customer.");
-    }
+    return Results.Ok(dto);
 });
 
 // _____________________________Appointments_____________________________
@@ -103,8 +120,8 @@ app.MapPost("/appointments", async (AppointmentCreateDto dto, IAppointmentServic
     // Validate basic request
     if (dto.CustomerId <= 0)
         return Results.BadRequest(new { message = "CustomerId is required." });
-    if (!dto.BarberIds.Any())
-        return Results.BadRequest(new { message = "At least one BarberId is required." });
+    // if (!dto.BarberIds.Any())
+    //     return Results.BadRequest(new { message = "At least one BarberId is required." });
 
     try
     {
@@ -113,7 +130,7 @@ app.MapPost("/appointments", async (AppointmentCreateDto dto, IAppointmentServic
             AppointmentDateAndTime = dto.AppointmentDateAndTime,
             HaircutType = dto.HaircutType,
             CustomerId = dto.CustomerId,
-            Barbers = dto.BarberIds.Select(id => new Barber { Id = id }).ToList()
+            Barbers = new List<Barber>()
         };
 
         await appointmentService.CreateAsync(appointment);
@@ -155,19 +172,23 @@ app.MapPut("/appointments/{id:int}", async (int id, AppointmentUpdateDto dto, IA
 {
     try
     {
-        bool updated = await appointmentService.UpdateAsync(id, dto.BarberId, dto.AppointmentDateAndTime);
+        var updated = await appointmentService.UpdateAsync(
+            id,
+            dto.BarberId,
+            dto.AppointmentDateAndTime,
+            dto.HaircutType
+        );
 
         if (!updated)
-        {
             return Results.NotFound(new { message = $"Appointment with ID {id} not found." });
-        }
 
         return Results.Ok(new
         {
-            message = "Appointment updated successfully.",
+            message = "Appointment updated successfully",
             appointmentId = id,
-            newBarberId = dto.BarberId,
-            newTime = dto.AppointmentDateAndTime
+            dto.BarberId,
+            dto.AppointmentDateAndTime,
+            dto.HaircutType
         });
     }
     catch (KeyNotFoundException ex)
@@ -176,41 +197,64 @@ app.MapPut("/appointments/{id:int}", async (int id, AppointmentUpdateDto dto, IA
     }
     catch (InvalidOperationException ex)
     {
-        // If you add the double-booking check inside UpdateAsync
-        return Results.Conflict(new { message = ex.Message });
-    }
-    catch (Exception ex)
-    {
-        return Results.Problem("Failed to update appointment: " + ex.Message);
+        return Results.BadRequest(new { message = ex.Message });
     }
 });
+
+// app.MapPut("/appointments/{id:int}", async (int id, AppointmentUpdateDto dto, IAppointmentService appointmentService) =>
+// {
+//     try
+//     {
+//         var updated = await appointmentService.UpdateAsync(id, dto.BarberId, dto.AppointmentDateAndTime);
+
+//         if (!updated)
+//             return Results.NotFound(new { message = $"Appointment with ID {id} not found." });
+
+//         return Results.Ok(new
+//         {
+//             message = "Appointment updated successfully",
+//             appointmentId = id,
+//             dto.BarberId,
+//             dto.AppointmentDateAndTime
+//         });
+//     }
+//     catch (KeyNotFoundException ex)
+//     {
+//         return Results.NotFound(new { message = ex.Message });
+//     }
+//     catch (InvalidOperationException ex)
+//     {
+//         return Results.BadRequest(new { message = ex.Message });
+//     }
+//     catch (Exception ex)
+//     {
+//         return Results.Problem($"Something went wrong: {ex.Message}");
+//     }
+// });
 // Get all appointments by barberId
 app.MapGet("/appointments/barber/{barberId:int}", async (int barberId, IAppointmentService appointmentService) =>
 {
     try
     {
-        // Grabs all appointments associated with that barberId
         var appointments = await appointmentService.GetAppointmentsByBarberIdAsync(barberId);
-       
-        if (appointments == null || !appointments.Any())
-        {
-            // Handle no appointments found
-            return Results.NotFound(new { message = $"No appointments found for barber with ID {barberId}." });
-        }
 
-        var response = appointments.Select(a => new
+        if (!appointments.Any())
+            return Results.NotFound(new { message = $"No appointments found for barber {barberId}" });
+
+        var dtoList = appointments.Select(a => new AppointmentDto
         {
-            a.Id,
-            a.AppointmentDateAndTime,
+            Id = a.Id,
+            AppointmentDateAndTime = a.AppointmentDateAndTime,
             HaircutType = a.HaircutType.ToString(),
-            a.CustomerId
-        });
+            Barbers = a.Barbers.Select(b => new BarberDto { Id = b.Id, Name = b.Name }).ToList()
+        }).ToList();
 
-        return Results.Ok(response);
+        return Results.Ok(dtoList);
     }
     catch (Exception ex)
     {
-        return Results.Problem("Failed to retrieve appointments: " + ex.Message);
+        Console.WriteLine($"❌ ERROR: {ex}");
+        return Results.Problem($"Something went wrong: {ex.Message}");
     }
 });
 // Delete an existing Appointment
@@ -262,8 +306,80 @@ app.MapPost("/barbers", async (BarberCreateDto dto, IBarberService barberService
         return Results.Problem("Failed to create barber: " + ex.Message);
     }
 });
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<BarbershopDbContext>();
 
+    if (!context.Barbers.Any() && !context.Customers.Any())
+    {
+        // ✅ Barbers
+        var barber1 = new Barber { Name = "Alex Fadez" };
+        var barber2 = new Barber { Name = "Chris Linez" };
+        var barber3 = new Barber { Name = "Jordan Clippers" };
 
+        // ✅ Customers
+        var customer1 = new Customer { FirstName = "John", LastName = "Doe", Email = "john@example.com" };
+        var customer2 = new Customer { FirstName = "Jane", LastName = "Smith", Email = "jane@example.com" };
+        var customer3 = new Customer { FirstName = "Sam", LastName = "Williams", Email = "sam@example.com" };
+        var customer4 = new Customer { FirstName = "Emily", LastName = "Brown", Email = "emily@example.com" };
+
+        // ✅ Appointments (each has at least 1 barber assigned)
+        var appointment1 = new Appointment
+        {
+            AppointmentDateAndTime = DateTime.Today.AddHours(9),
+            HaircutType = HaircutType.Haircut,
+            Customer = customer1,
+            Barbers = new List<Barber> { barber1 }
+        };
+
+        var appointment2 = new Appointment
+        {
+            AppointmentDateAndTime = DateTime.Today.AddHours(10),
+            HaircutType = HaircutType.HaircutAndBeard,
+            Customer = customer2,
+            Barbers = new List<Barber> { barber2 }
+        };
+
+        var appointment3 = new Appointment
+        {
+            AppointmentDateAndTime = DateTime.Today.AddHours(11),
+            HaircutType = HaircutType.ShapeUp,
+            Customer = customer3,
+            Barbers = new List<Barber> { barber3 }
+        };
+
+        var appointment4 = new Appointment
+        {
+            AppointmentDateAndTime = DateTime.Today.AddHours(13),
+            HaircutType = HaircutType.Shampoo,
+            Customer = customer4,
+            Barbers = new List<Barber> { barber1, barber2 }
+        };
+
+        var appointment5 = new Appointment
+        {
+            AppointmentDateAndTime = DateTime.Today.AddHours(15),
+            HaircutType = HaircutType.TheWorks,
+            Customer = customer1,
+            Barbers = new List<Barber> { barber2, barber3 }
+        };
+
+        var appointment6 = new Appointment
+        {
+            AppointmentDateAndTime = DateTime.Today.AddHours(16),
+            HaircutType = HaircutType.Haircut,
+            Customer = customer2,
+            Barbers = new List<Barber> { barber1, barber3 }
+        };
+
+        // ✅ Add everything to context
+        context.AddRange(barber1, barber2, barber3);
+        context.AddRange(customer1, customer2, customer3, customer4);
+        context.AddRange(appointment1, appointment2, appointment3, appointment4, appointment5, appointment6);
+
+        context.SaveChanges();
+    }
+}
 
 app.Run();
 

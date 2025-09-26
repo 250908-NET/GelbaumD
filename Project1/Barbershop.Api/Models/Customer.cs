@@ -18,7 +18,7 @@ public class Customer
     public string LastName { get; set; }
 
     [Required]
-    public string Email { get; set; }
+    public string Email { get; set; } 
 
     public List<Appointment> Appointments { get; set; } = new();
 

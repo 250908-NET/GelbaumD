@@ -4,8 +4,8 @@ namespace Barbershop.Repositories
 {
     public interface ICustomerRepository
     {
-        public Task<Customer?> GetByIdAsync(int id);
-        public Task AddAsync(Customer customer);
-        public Task SaveChangesAsync();
+        Task<Customer?> GetByIdAsync(int id);
+        Task AddAsync(Customer customer);
+        Task SaveChangesAsync();
     }
 }
